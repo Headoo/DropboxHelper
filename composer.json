@@ -1,0 +1,38 @@
+{
+    "name": "headoo/dropboxhelper",
+    "description": "Minimalist Helper to use PHP SDK alorel/dropbox-v2-php",
+    "prefer-stable": true,
+    "type": "library",
+    "license": "proprietary",
+    "homepage": "https://github.com/headoo/DropboxHelper",
+    "keywords": [
+        "PHP",
+        "Dropbox",
+        "API",
+        "SDK"
+    ],
+    "authors": [
+        {
+            "name": "CorentinHeadoo",
+            "email": "corentin@headoo.com",
+            "role": "Developer",
+            "homepage": "https://github.com/Headoo"
+        }
+    ],
+    "require": {
+        "alorel/dropbox-v2-php": "^0.4.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Headoo\\DropboxHelper\\": "src"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.0.1"
+        }
+    }
+}
