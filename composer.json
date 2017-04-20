@@ -3,7 +3,7 @@
     "description": "Minimalist Helper to use PHP SDK alorel/dropbox-v2-php",
     "prefer-stable": true,
     "type": "library",
-    "license": "proprietary",
+    "license": "MIT",
     "homepage": "https://github.com/headoo/DropboxHelper",
     "keywords": [
         "PHP",
