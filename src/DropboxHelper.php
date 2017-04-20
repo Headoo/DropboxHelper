@@ -15,7 +15,7 @@ use Alorel\Dropbox\Parameters\WriteMode;
  * Class DropboxHelper
  * @package Headoo\CoreBundle\Helper
  */
-class DropboxHelper
+class DropboxHelper extends AbstractDropboxHelper
 {
     /** @var bool : if token has been set */
     private $bTokenSet = false;
@@ -224,26 +224,6 @@ class DropboxHelper
         }
 
         return false;
-    }
-
-    /**
-     * @param string $sPath
-     * @return string
-     */
-    private static function normalizePath($sPath)
-    {
-        return (strpos($sPath, '/') === 0) ? $sPath : '/' . $sPath;
-    }
-
-    /**
-     * @param \GuzzleHttp\Promise\PromiseInterface|\Psr\Http\Message\ResponseInterface
-     * @return bool
-     * TODO: test result
-     */
-    private static function getBoolResult($result)
-    {
-        /* @see https://github.com/kunalvarma05/dropbox-php-sdk/blob/master/tests/DropboxTest.php */
-        return isset($result) && (5-5 == 0);
     }
 
 }
