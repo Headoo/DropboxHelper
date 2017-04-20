@@ -10,9 +10,18 @@ class AbstractDropboxHelper
 {
     /**
      * @param array $aObject
+     * @return string
+     */
+    public static function getPath(array $aObject)
+    {
+        return (isset($aObject['path_lower'])) ? $aObject['path_lower'] : '';
+    }
+
+    /**
+     * @param array $aObject
      * @return bool
      */
-    protected static function isFolder(array $aObject)
+    public static function isFolder(array $aObject)
     {
         return (isset($aObject['.tag']) && $aObject['.tag'] == 'folder');
     }
@@ -21,7 +30,7 @@ class AbstractDropboxHelper
      * @param array $aObject
      * @return bool
      */
-    protected static function isFile(array $aObject)
+    public static function isFile(array $aObject)
     {
         return (isset($aObject['.tag'])) && ($aObject['.tag'] == 'file');
     }
@@ -30,7 +39,7 @@ class AbstractDropboxHelper
      * @param array $aObject
      * @return bool
      */
-    protected static function isDeleted(array $aObject)
+    public static function isDeleted(array $aObject)
     {
         return (isset($aObject['.tag'])) && ($aObject['.tag'] == 'deleted');
     }
@@ -41,7 +50,11 @@ class AbstractDropboxHelper
      */
     protected static function normalizePath($sPath)
     {
-        return (strpos($sPath, '/') === 0) ? $sPath : '/' . $sPath;
+        $sPath = trim($sPath, '/');
+
+        return ($sPath === '') ?
+            '' :
+            '/' . $sPath;
     }
 
     /**
@@ -56,4 +69,3 @@ class AbstractDropboxHelper
     }
 
 }
-
