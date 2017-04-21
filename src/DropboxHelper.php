@@ -5,8 +5,6 @@ namespace Headoo\DropboxHelper;
 use Alorel\Dropbox\Operation\AbstractOperation;
 use Alorel\Dropbox\Operation\Files\Delete;
 use Alorel\Dropbox\Operation\Files\Download;
-use Alorel\Dropbox\Operation\Files\ListFolder\ListFolder;
-use Alorel\Dropbox\Operation\Files\ListFolder\ListFolderContinue;
 use Alorel\Dropbox\Operation\Files\Upload;
 use Alorel\Dropbox\Options\Builder\UploadOptions;
 use Alorel\Dropbox\Parameters\WriteMode;
@@ -22,16 +20,6 @@ class DropboxHelper extends AbstractDropboxHelper
 
     /** @var UploadOptions : Option to overwrite file */
     private $oOptionUploadOverwrite;
-
-    /**
-     *  Use to iterate folder
-     */
-    /** @var int : index of current object */
-    private $iFolderIndex = 0;
-    /** @var array : list of object in the current folder */
-    private $aFolder = [];
-    /** @var bool : is a folder is currently reading */
-    private $bFolderReading = false;
 
     /**
      * DropboxHelper constructor.
@@ -104,127 +92,28 @@ class DropboxHelper extends AbstractDropboxHelper
     }
 
     /**
-     * Load a folder. Use next() to get object inside the folder
      * @param string $sFolderPath
-     * @return bool
+     * @return Folder
      */
-    public function loadFolder($sFolderPath)
+    public function loadFolderPath($sFolderPath)
     {
-        $sFolder = (new ListFolder())
-            ->raw($sFolderPath)
-            ->getBody()
-            ->getContents();
+        $oFolder = new Folder();
+        $oFolder->loadFolderPath($sFolderPath);
 
-        return $this->initLoadingPartOfFolder($sFolder);
+        return $oFolder;
     }
 
     /**
      * Load a folder from the Cursor, return only the delta
      * @param string $sCursor
-     * @return bool
+     * @return Folder
      */
-    public function loadFolderContinue($sCursor)
+    public function loadFolderCursor($sCursor)
     {
-        $sFolder = (new ListFolderContinue())
-            ->raw($sCursor)
-            ->getBody()
-            ->getContents();
+        $oFolder = new Folder();
+        $oFolder->loadFolderCursor($sCursor);
 
-        return $this->initLoadingPartOfFolder($sFolder);
+        return $oFolder;
     }
-
-    /**
-     * Return next object of a loaded folder.
-     * Use loadFolder() at first
-     * @return array
-     * @throws Exception\FolderNotLoadException
-     */
-    public function next()
-    {
-        # You have to loadFolder before
-        $this->isFolderLoaded(true);
-
-        # One object is set on current index
-        if (isset($this->aFolder["entries"][$this->iFolderIndex])) {
-            return $this->getObjectOnCurrentIndex();
-        }
-
-        # We already get all "entries", BUT the folder "has_more" result, so we load mode objects
-        if ($this->aFolder["has_more"] != false) {
-            # Mind that, at the time of writing, Dropbox has a 2k result limit, so you might want to scan for them until there are no results available
-            $this->loadFolderContinue($this->getLoadedFolderCursor());
-
-            return $this->getObjectOnCurrentIndex();
-        }
-
-        # End of folder
-        $this->bFolderReading = false;
-        unset($this->aFolder);
-
-        return null;
-    }
-
-    /**
-     * Get the cursor of the folder loaded
-     * @return string
-     */
-    public function getLoadedFolderCursor()
-    {
-        $this->isFolderLoaded(true);
-
-        return $this->aFolder['cursor'];
-    }
-
-    /**
-     * Initialize index
-     * @param string $sFolder
-     * @return bool
-     */
-    private function initLoadingPartOfFolder($sFolder)
-    {
-        $this->aFolder = json_decode($sFolder, true);
-        $this->iFolderIndex = 0;
-
-        if (!is_array($this->aFolder) || !isset($this->aFolder["entries"])) {
-            $this->aFolder = null;
-
-            return false;
-        }
-
-        $this->bFolderReading = (count($this->aFolder["entries"]) != 0);
-
-        return $this->bFolderReading;
-    }
-
-    /**
-     * Return the object on index, increment index
-     * @return array
-     */
-    private function getObjectOnCurrentIndex()
-    {
-        $object = $this->aFolder["entries"][$this->iFolderIndex];
-        $this->iFolderIndex++;
-
-        return $object;
-    }
-
-    /**
-     * @param bool $bStrict : throw Exception in strict mode
-     * @return bool
-     * @throws Exception\FolderNotLoadException
-     */
-    private function isFolderLoaded($bStrict = false)
-    {
-        if ($this->bFolderReading === true) {
-            return true;
-        }
-
-        if ($bStrict) {
-            throw new Exception\FolderNotLoadException("Dropbox configuration error. Trying to get cursor without a reading folder. call loadFolder()/loadFolderContinue() before");
-        }
-
-        return false;
-    }
-
 }
 

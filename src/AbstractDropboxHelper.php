@@ -2,6 +2,8 @@
 
 namespace Headoo\DropboxHelper;
 
+use Alorel\Dropbox\Response\ResponseAttribute;
+
 /**
  * Class DropboxHelper
  * @package Headoo\CoreBundle\Helper
@@ -14,7 +16,9 @@ class AbstractDropboxHelper
      */
     public static function getPath(array $aObject)
     {
-        return (isset($aObject['path_lower'])) ? $aObject['path_lower'] : '';
+        return isset($aObject[ResponseAttribute::PATH_LOWERCASE])
+            ? $aObject[ResponseAttribute::PATH_LOWERCASE]
+            : '';
     }
 
     /**
@@ -23,7 +27,10 @@ class AbstractDropboxHelper
      */
     public static function isFolder(array $aObject)
     {
-        return (isset($aObject['.tag']) && $aObject['.tag'] == 'folder');
+        return (
+            isset($aObject[ResponseAttribute::DOT_TAG])
+            && $aObject[ResponseAttribute::DOT_TAG] == 'folder'
+        );
     }
 
     /**
@@ -32,7 +39,10 @@ class AbstractDropboxHelper
      */
     public static function isFile(array $aObject)
     {
-        return (isset($aObject['.tag'])) && ($aObject['.tag'] == 'file');
+        return (
+            isset($aObject[ResponseAttribute::DOT_TAG])
+            && $aObject[ResponseAttribute::DOT_TAG] == 'file'
+        );
     }
 
     /**
@@ -41,7 +51,10 @@ class AbstractDropboxHelper
      */
     public static function isDeleted(array $aObject)
     {
-        return (isset($aObject['.tag'])) && ($aObject['.tag'] == 'deleted');
+        return (
+            isset($aObject[ResponseAttribute::DOT_TAG])
+            && $aObject[ResponseAttribute::DOT_TAG] == 'deleted'
+        );
     }
 
     /**
@@ -52,9 +65,9 @@ class AbstractDropboxHelper
     {
         $sPath = trim($sPath, '/');
 
-        return ($sPath === '') ?
-            '' :
-            '/' . $sPath;
+        return ($sPath === '')
+            ? ''
+            : '/' . $sPath;
     }
 
     /**
