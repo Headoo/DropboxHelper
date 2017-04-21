@@ -106,7 +106,7 @@ class Folder
         $this->iFolderIndex = 0;
 
         if (!is_array($this->aFolder) || !isset($this->aFolder["entries"])) {
-            $this->aFolder = null;
+            $this->initializeFolder();
 
             return false;
         }

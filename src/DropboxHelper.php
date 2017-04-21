@@ -98,9 +98,9 @@ class DropboxHelper extends AbstractDropboxHelper
     public function loadFolderPath($sFolderPath)
     {
         $oFolder = new Folder();
-        $oFolder->loadFolderPath($sFolderPath);
+        $bResult = $oFolder->loadFolderPath($sFolderPath);
 
-        return $oFolder;
+        return ($bResult) ? $oFolder : null;
     }
 
     /**
@@ -111,9 +111,9 @@ class DropboxHelper extends AbstractDropboxHelper
     public function loadFolderCursor($sCursor)
     {
         $oFolder = new Folder();
-        $oFolder->loadFolderCursor($sCursor);
+        $bResult = $oFolder->loadFolderCursor($sCursor);
 
-        return $oFolder;
+        return ($bResult) ? $oFolder : null;
     }
 }
 
