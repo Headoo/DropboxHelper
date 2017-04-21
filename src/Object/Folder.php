@@ -1,9 +1,10 @@
 <?php
 
-namespace Headoo\DropboxHelper;
+namespace Headoo\DropboxHelper\Object;
 
 use Alorel\Dropbox\Operation\Files\ListFolder\ListFolder;
 use Alorel\Dropbox\Operation\Files\ListFolder\ListFolderContinue;
+use Headoo\DropboxHelper\Exception\FolderNotLoadException;
 
 /**
  * Class Folder
@@ -57,7 +58,7 @@ class Folder
      * Return next object of a loaded folder.
      * Use loadFolder() at first
      * @return array
-     * @throws Exception\FolderNotLoadException
+     * @throws FolderNotLoadException
      */
     public function next()
     {
@@ -131,7 +132,7 @@ class Folder
     /**
      * @param bool $bStrict : throw Exception in strict mode
      * @return bool
-     * @throws Exception\FolderNotLoadException
+     * @throws FolderNotLoadException
      */
     private function isFolderLoaded($bStrict = false)
     {
@@ -140,7 +141,7 @@ class Folder
         }
 
         if ($bStrict) {
-            throw new Exception\FolderNotLoadException("Dropbox configuration error. Trying to get cursor without a reading folder. call loadFolder()/loadFolderContinue() before");
+            throw new FolderNotLoadException("Dropbox configuration error. Trying to get cursor without a reading folder. call loadFolder()/loadFolderContinue() before");
         }
 
         return false;

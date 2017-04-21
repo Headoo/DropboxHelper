@@ -8,6 +8,7 @@ use Alorel\Dropbox\Operation\Files\Download;
 use Alorel\Dropbox\Operation\Files\Upload;
 use Alorel\Dropbox\Options\Builder\UploadOptions;
 use Alorel\Dropbox\Parameters\WriteMode;
+use Headoo\DropboxHelper\Object\Folder;
 
 /**
  * Class DropboxHelper
@@ -23,24 +24,24 @@ class DropboxHelper extends AbstractDropboxHelper
 
     /**
      * DropboxHelper constructor.
-     * @param string $sDopboxToken
+     * @param string $sDropboxToken
      */
-    public function __construct($sDopboxToken = null)
+    public function __construct($sDropboxToken = null)
     {
         AbstractOperation::setDefaultAsync(false);
-        $this->setToken($sDopboxToken);
+        $this->setToken($sDropboxToken);
 
         $this->oOptionUploadOverwrite = (new UploadOptions())->setWriteMode(WriteMode::overwrite());
     }
 
     /**
-     * @param string $sDopboxToken
+     * @param string $sDropboxToken
      * @return bool
      */
-    public function setToken($sDopboxToken = null)
+    public function setToken($sDropboxToken = null)
     {
-        if (!empty($sDopboxToken)) {
-            AbstractOperation::setDefaultToken($sDopboxToken);
+        if (!empty($sDropboxToken)) {
+            AbstractOperation::setDefaultToken($sDropboxToken);
             $this->bTokenSet = true;
         }
 
