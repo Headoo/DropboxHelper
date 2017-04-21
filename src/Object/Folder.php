@@ -73,7 +73,7 @@ class Folder
         # We already get all "entries", BUT the folder "has_more" result, so we load mode objects
         if ($this->aFolder["has_more"] != false) {
             # Mind that, at the time of writing, Dropbox has a 2k result limit, so you might want to scan for them until there are no results available
-            $this->loadFolderCursor($this->getLoadedFolderCursor());
+            $this->loadFolderCursor($this->getCursor());
 
             return $this->getObjectOnCurrentIndex();
         }
@@ -89,7 +89,7 @@ class Folder
      * Get the cursor of the folder loaded
      * @return string
      */
-    public function getLoadedFolderCursor()
+    public function getCursor()
     {
         $this->isFolderLoaded(true);
 

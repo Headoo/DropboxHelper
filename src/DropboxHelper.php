@@ -56,11 +56,17 @@ class DropboxHelper extends AbstractDropboxHelper
      */
     public function write($sPath, $sContent)
     {
-        $result = (new Upload())->raw(
-            self::normalizePath($sPath),
-            $sContent,
-            $this->oOptionUploadOverwrite
-        );
+        $result = null;
+
+        try {
+            $result = (new Upload())->raw(
+                self::normalizePath($sPath),
+                $sContent,
+                $this->oOptionUploadOverwrite
+            );
+        } catch (\Exception $e) {
+            $this->handlerException($e);
+        }
 
         return self::getBoolResult($result);
     }
@@ -72,9 +78,15 @@ class DropboxHelper extends AbstractDropboxHelper
      */
     public function delete($sPath)
     {
-        $result = (new Delete())->raw(
-            self::normalizePath($sPath)
-        );
+        $result = null;
+
+        try {
+            $result = (new Delete())->raw(
+                self::normalizePath($sPath)
+            );
+        } catch(\Exception $e) {
+            $this->handlerException($e);
+        }
 
         return self::getBoolResult($result);
     }
@@ -86,10 +98,18 @@ class DropboxHelper extends AbstractDropboxHelper
      */
     public function read($sPath)
     {
-        return (new Download())
-            ->raw(self::normalizePath($sPath))
-            ->getBody()
-            ->getContents();
+        $sContent = null;
+
+        try {
+            $sContent = (new Download())
+                ->raw(self::normalizePath($sPath))
+                ->getBody()
+                ->getContents();
+        } catch(\Exception $e) {
+            $this->handlerException($e);
+        }
+
+        return $sContent;
     }
 
     /**
@@ -99,9 +119,14 @@ class DropboxHelper extends AbstractDropboxHelper
     public function loadFolderPath($sFolderPath)
     {
         $oFolder = new Folder();
-        $bResult = $oFolder->loadFolderPath($sFolderPath);
 
-        return ($bResult) ? $oFolder : null;
+        try {
+            $bResult = $oFolder->loadFolderPath($sFolderPath);
+        } catch(\Exception $e) {
+            $this->handlerException($e);
+        }
+
+        return (isset($bResult)) ? $oFolder : null;
     }
 
     /**
@@ -116,5 +141,6 @@ class DropboxHelper extends AbstractDropboxHelper
 
         return ($bResult) ? $oFolder : null;
     }
+
 }
 

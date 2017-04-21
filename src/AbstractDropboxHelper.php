@@ -3,6 +3,7 @@
 namespace Headoo\DropboxHelper;
 
 use Alorel\Dropbox\Response\ResponseAttribute;
+use Headoo\DropboxHelper\Exception\NotFoundException;
 
 /**
  * Class DropboxHelper
@@ -10,6 +11,21 @@ use Alorel\Dropbox\Response\ResponseAttribute;
  */
 class AbstractDropboxHelper
 {
+    const MODE_STRICT = true;
+    const MODE_SILENCE = false;
+
+    protected $exceptionMode = self::MODE_STRICT;
+
+    public function setModeStrict()
+    {
+        $this->exceptionMode = self::MODE_STRICT;
+    }
+
+    public function setModeSilence()
+    {
+        $this->exceptionMode = self::MODE_SILENCE;
+    }
+
     /**
      * @param array $aObject
      * @return string
@@ -79,6 +95,22 @@ class AbstractDropboxHelper
     {
         /* @see https://github.com/kunalvarma05/dropbox-php-sdk/blob/master/tests/DropboxTest.php */
         return isset($result) && (5-5 == 0);
+    }
+
+
+    protected function handlerException(\Exception $e)
+    {
+        if ($e instanceof \GuzzleHttp\Exception\ClientException) {
+            switch ($e->getCode()) {
+                case 409:
+                    if ($this->exceptionMode === self::MODE_SILENCE) {
+                        return;
+                    }
+                    throw new NotFoundException('Folder not found: ' . $e->getMessage());
+            }
+        }
+
+        throw $e;
     }
 
 }
