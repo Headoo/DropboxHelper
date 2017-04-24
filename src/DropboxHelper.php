@@ -6,6 +6,8 @@ use Alorel\Dropbox\Operation\AbstractOperation;
 use Alorel\Dropbox\Operation\Files\Delete;
 use Alorel\Dropbox\Operation\Files\Download;
 use Alorel\Dropbox\Operation\Files\Upload;
+use Alorel\Dropbox\Operation\Users\GetAccount;
+use Alorel\Dropbox\Operation\Users\GetCurrentAccount;
 use Alorel\Dropbox\Options\Builder\UploadOptions;
 use Alorel\Dropbox\Parameters\WriteMode;
 use Headoo\DropboxHelper\Object\Folder;
@@ -110,6 +112,14 @@ class DropboxHelper extends AbstractDropboxHelper
         }
 
         return $sContent;
+    }
+
+    public function getCurrentAccount()
+    {
+        return (new GetCurrentAccount())
+            ->raw()
+            ->getBody()
+            ->getContents();
     }
 
     /**

@@ -29,6 +29,17 @@ class DropboxHelperTest extends TestCase
         }
     }
 
+    /**
+     *
+     */
+    public function testGetCurrentAccount()
+    {
+        $result = $this->dropboxHelper->getCurrentAccount();
+        self::assertNotNull($result, 'Cannot get account information.');
+
+        var_dump(json_decode($result, true));
+    }
+
     public function testWriteReadDeleteFile()
     {
         $sTestFilePath = $this->sFolderPath . '/DropboxHelper-test-file-' . uniqid() . '.txt';
