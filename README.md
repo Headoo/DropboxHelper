@@ -12,14 +12,14 @@ Simplifies at best the following uses at Dropbox:
 - list the delta of a folder from the cursor 
 - get account information of the connected account 
 
-#Installation
+# Installation
 
 Via Composer
 ``` bash
 $ composer require headoo/dropboxhelper
 ```
 
-#Utilisation
+# Utilisation
 
 Load the helper:
 ```php
@@ -27,6 +27,13 @@ Load the helper:
     use \Headoo\DropboxHelper\DropboxHelper;
 
     $dropboxHelper = new DropboxHelper($yourAppDropboxToken);
+?>
+```
+or
+```php
+<?php
+    $dropboxHelper = new DropboxHelper();
+    $dropboxHelper->setToken($yourAppDropboxToken);
 ?>
 ```
 
