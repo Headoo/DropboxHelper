@@ -62,6 +62,19 @@ class DropboxHelperTest extends TestCase
         self::assertTrue($bResult, 'Failed to delete a file: ' . $sTestFilePath);
     }
 
+    public function testGetCursorOnNotLoadedFolder()
+    {
+        if (!$this->dropboxHelper) {
+            return;
+        }
+
+        $bResult = (new Folder())
+            ->setModeSilence()
+            ->getCursor();
+
+        self::assertNull($bResult, 'Should not read cursor on a not loaded folder');
+    }
+
     public function testGetCursor()
     {
         if (!$this->dropboxHelper) {
