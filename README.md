@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/Headoo/DropboxHelper.svg?branch=master)](https://travis-ci.org/Headoo/DropboxHelper)
+[![codecov](https://codecov.io/gh/Headoo/DropboxHelper/branch/master/graph/badge.svg)](https://codecov.io/gh/Headoo/DropboxHelper)
 [![Latest Stable Version](https://poser.pugx.org/headoo/dropboxhelper/v/stable)](https://packagist.org/packages/headoo/dropboxhelper)
 [![License](https://poser.pugx.org/headoo/dropboxhelper/license)](https://packagist.org/packages/headoo/dropboxhelper)
 
