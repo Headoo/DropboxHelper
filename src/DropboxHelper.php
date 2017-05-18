@@ -137,7 +137,7 @@ class DropboxHelper extends AbstractDropboxHelper
             $this->handlerException($e, $this->getExceptionMode());
         }
 
-        return (isset($bResult)) ? $oFolder : null;
+        return (isset($bResult) && $bResult === true) ? $oFolder : null;
     }
 
     /**
