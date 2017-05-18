@@ -6,10 +6,10 @@ use Alorel\Dropbox\Operation\AbstractOperation;
 use Alorel\Dropbox\Operation\Files\Delete;
 use Alorel\Dropbox\Operation\Files\Download;
 use Alorel\Dropbox\Operation\Files\Upload;
-use Alorel\Dropbox\Operation\Users\GetAccount;
 use Alorel\Dropbox\Operation\Users\GetCurrentAccount;
 use Alorel\Dropbox\Options\Builder\UploadOptions;
 use Alorel\Dropbox\Parameters\WriteMode;
+use Headoo\DropboxHelper\AbstractClass\AbstractDropboxHelper;
 use Headoo\DropboxHelper\Object\Folder;
 
 /**
@@ -67,7 +67,7 @@ class DropboxHelper extends AbstractDropboxHelper
                 $this->oOptionUploadOverwrite
             );
         } catch (\Exception $e) {
-            $this->handlerException($e);
+            $this->handlerException($e, $this->getExceptionMode());
         }
 
         return self::getBoolResult($result);
@@ -87,7 +87,7 @@ class DropboxHelper extends AbstractDropboxHelper
                 self::normalizePath($sPath)
             );
         } catch(\Exception $e) {
-            $this->handlerException($e);
+            $this->handlerException($e, $this->getExceptionMode());
         }
 
         return self::getBoolResult($result);
@@ -108,7 +108,7 @@ class DropboxHelper extends AbstractDropboxHelper
                 ->getBody()
                 ->getContents();
         } catch(\Exception $e) {
-            $this->handlerException($e);
+            $this->handlerException($e, $this->getExceptionMode());
         }
 
         return $sContent;
@@ -129,14 +129,15 @@ class DropboxHelper extends AbstractDropboxHelper
     public function loadFolderPath($sFolderPath)
     {
         $oFolder = new Folder();
+        $oFolder->setExceptionMode($this->getExceptionMode());
 
         try {
             $bResult = $oFolder->loadFolderPath($sFolderPath);
         } catch(\Exception $e) {
-            $this->handlerException($e);
+            $this->handlerException($e, $this->getExceptionMode());
         }
 
-        return (isset($bResult)) ? $oFolder : null;
+        return (isset($bResult) && $bResult === true) ? $oFolder : null;
     }
 
     /**
@@ -147,6 +148,8 @@ class DropboxHelper extends AbstractDropboxHelper
     public function loadFolderCursor($sCursor)
     {
         $oFolder = new Folder();
+        $oFolder->setExceptionMode($this->getExceptionMode());
+
         $bResult = $oFolder->loadFolderCursor($sCursor);
 
         return ($bResult) ? $oFolder : null;

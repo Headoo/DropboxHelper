@@ -1,6 +1,6 @@
 <?php
 
-namespace Headoo\DropboxHelper;
+namespace Headoo\DropboxHelper\AbstractClass;
 
 use Alorel\Dropbox\Response\ResponseAttribute;
 use Headoo\DropboxHelper\Exception\NotFoundException;
@@ -9,22 +9,8 @@ use Headoo\DropboxHelper\Exception\NotFoundException;
  * Class DropboxHelper
  * @package Headoo\CoreBundle\Helper
  */
-class AbstractDropboxHelper
+class AbstractDropboxHelper extends AbstractExceptionMode
 {
-    const MODE_STRICT = true;
-    const MODE_SILENCE = false;
-
-    protected $exceptionMode = self::MODE_STRICT;
-
-    public function setModeStrict()
-    {
-        $this->exceptionMode = self::MODE_STRICT;
-    }
-
-    public function setModeSilence()
-    {
-        $this->exceptionMode = self::MODE_SILENCE;
-    }
 
     /**
      * @param array $aObject
@@ -97,13 +83,18 @@ class AbstractDropboxHelper
         return isset($result) && (5-5 == 0);
     }
 
-
-    protected function handlerException(\Exception $e)
+    /**
+     * @param \Exception $e
+     * @param bool $exceptionMode
+     * @throws NotFoundException
+     */
+    protected static function handlerException(\Exception $e, $exceptionMode = self::MODE_STRICT)
     {
         if ($e instanceof \GuzzleHttp\Exception\ClientException) {
             switch ($e->getCode()) {
+                # Folder/file not found with the given path
                 case 409:
-                    if ($this->exceptionMode === self::MODE_SILENCE) {
+                    if ($exceptionMode === self::MODE_SILENCE) {
                         return;
                     }
                     throw new NotFoundException('Folder not found: ' . $e->getMessage());

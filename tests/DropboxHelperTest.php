@@ -62,6 +62,19 @@ class DropboxHelperTest extends TestCase
         self::assertTrue($bResult, 'Failed to delete a file: ' . $sTestFilePath);
     }
 
+    public function testGetCursorOnNotLoadedFolder()
+    {
+        if (!$this->dropboxHelper) {
+            return;
+        }
+
+        $bResult = (new Folder())
+            ->setModeSilence()
+            ->getCursor();
+
+        self::assertNull($bResult, 'Should not read cursor on a not loaded folder');
+    }
+
     public function testGetCursor()
     {
         if (!$this->dropboxHelper) {
@@ -85,6 +98,7 @@ class DropboxHelperTest extends TestCase
             return;
         }
 
+        $this->dropboxHelper->setModeStrict();
         $this->dropboxHelper->read('/iam/sure/this/folder/do/not/exists.txt');
     }
 
@@ -102,15 +116,16 @@ class DropboxHelperTest extends TestCase
     /**
      * @expectedException \Headoo\DropboxHelper\Exception\NotFoundException
      */
-    public function testNotExistingFolderStritMode()
+    public function testNotExistingFolderStrictMode()
     {
         if (!$this->dropboxHelper) {
             return;
         }
 
-        $oFolder = $this->dropboxHelper->loadFolderPath('/iam/sure/this/folder/do/not/exists');
+        $this->dropboxHelper->setModeStrict();
+        $this->dropboxHelper->loadFolderPath('/iam/sure/this/folder/do/not/exists');
 
-        self::assertNull($oFolder, 'Expected folder is null with an unknown path');
+        self::assertTrue(false, 'Expected exception');
     }
 
     public function testNotExistingFolderSilenceMode()
@@ -121,15 +136,29 @@ class DropboxHelperTest extends TestCase
 
         $this->dropboxHelper->setModeSilence();
         $oFolder = $this->dropboxHelper->loadFolderPath('/iam/sure/this/folder/do/not/exists');
+
         self::assertNull($oFolder, 'Expected folder is null with an unknown path');
     }
 
     /**
      * @expectedException \Headoo\DropboxHelper\Exception\FolderNotLoadException
      */
-    public function testNoToken()
+    public function testNoTokenStrictMode()
     {
-        (new Folder())->next();
+        $this->dropboxHelper->setModeStrict();
+        (new Folder())
+            ->setExceptionMode($this->dropboxHelper->getExceptionMode())
+            ->next();
+    }
+
+    public function testNoTokenSilenceMode()
+    {
+        $this->dropboxHelper->setModeSilence();
+        $bResult = (new Folder())
+            ->setExceptionMode($this->dropboxHelper->getExceptionMode())
+            ->next();
+
+        self::assertNull($bResult, 'Expected folder is not loaded in silence mode');
     }
 
     public function testListFolderFromName()
@@ -146,8 +175,16 @@ class DropboxHelperTest extends TestCase
         $oFolder = $this->dropboxHelper->loadFolderPath($this->sFolderPath);
 
         echo "\nList Folder: {$this->sFolderPath}\n";
-        while ($oFolder && ($aFolder = $oFolder->next())) {
-            echo $aFolder['.tag'] . ':' . $aFolder['name'] . ' ';
+        while ($oFolder && ($aMedia = $oFolder->next())) {
+            if (DropboxHelper::isFile($aMedia)) {
+                echo 'File:' . $aMedia['name'] . ' ';
+            }
+            if (DropboxHelper::isFolder($aMedia)) {
+                echo 'Folder:' . DropboxHelper::getPath($aMedia);
+            }
+            if (DropboxHelper::isDeleted($aMedia)) {
+                echo 'Deleted:' . $aMedia['name'] . ' ';
+            }
         }
 
         echo "\n";

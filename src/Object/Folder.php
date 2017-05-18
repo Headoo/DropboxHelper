@@ -4,13 +4,15 @@ namespace Headoo\DropboxHelper\Object;
 
 use Alorel\Dropbox\Operation\Files\ListFolder\ListFolder;
 use Alorel\Dropbox\Operation\Files\ListFolder\ListFolderContinue;
+use Headoo\DropboxHelper\AbstractClass\AbstractExceptionMode;
+use Headoo\DropboxHelper\DropboxHelper;
 use Headoo\DropboxHelper\Exception\FolderNotLoadException;
 
 /**
  * Class Folder
  * @package Headoo\DropboxHelper
  */
-class Folder
+class Folder extends AbstractExceptionMode
 {
     /** @var int $iFolderIndex: index of current object */
     private $iFolderIndex = 0;
@@ -63,7 +65,10 @@ class Folder
     public function next()
     {
         # You have to loadFolder before
-        $this->isFolderLoaded(true);
+        $bLoaded = $this->isFolderLoaded();
+        if ($bLoaded === false) {
+            return null;
+        }
 
         # One object is set on current index
         if (isset($this->aFolder["entries"][$this->iFolderIndex])) {
@@ -91,7 +96,11 @@ class Folder
      */
     public function getCursor()
     {
-        $this->isFolderLoaded(true);
+        $bLoaded = $this->isFolderLoaded();
+
+        if ($bLoaded === false) {
+            return null;
+        }
 
         return $this->aFolder['cursor'];
     }
@@ -106,12 +115,14 @@ class Folder
         $this->aFolder = json_decode($sFolder, true);
         $this->iFolderIndex = 0;
 
+        # Something get wrong
         if (!is_array($this->aFolder) || !isset($this->aFolder["entries"])) {
             $this->initializeFolder();
 
             return false;
         }
 
+        # If folder has some entries
         $this->bFolderReading = (count($this->aFolder["entries"]) != 0);
 
         return $this->bFolderReading;
@@ -130,17 +141,17 @@ class Folder
     }
 
     /**
-     * @param bool $bStrict : throw Exception in strict mode
      * @return bool
      * @throws FolderNotLoadException
      */
-    private function isFolderLoaded($bStrict = false)
+    private function isFolderLoaded()
     {
         if ($this->bFolderReading === true) {
             return true;
         }
 
-        if ($bStrict) {
+        # throw Exception in strict mode
+        if ($this->exceptionMode === DropboxHelper::MODE_STRICT) {
             throw new FolderNotLoadException("Dropbox configuration error. Trying to get cursor without a reading folder. call loadFolder()/loadFolderContinue() before");
         }
 
