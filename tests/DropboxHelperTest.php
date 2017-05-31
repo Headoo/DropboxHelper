@@ -36,8 +36,6 @@ class DropboxHelperTest extends TestCase
     {
         $result = $this->dropboxHelper->getCurrentAccount();
         self::assertNotNull($result, 'Cannot get account information.');
-
-        var_dump(json_decode($result, true));
     }
 
     public function testWriteReadDeleteFile()
