@@ -5,6 +5,7 @@ namespace Headoo\DropboxHelper\Object;
 use Alorel\Dropbox\Operation\Files\ListFolder\ListFolder;
 use Alorel\Dropbox\Operation\Files\ListFolder\ListFolderContinue;
 use Headoo\DropboxHelper\AbstractClass\AbstractExceptionMode;
+use Headoo\DropboxHelper\DropboxHelper;
 use Headoo\DropboxHelper\Exception\FolderNotLoadException;
 
 /**
@@ -61,6 +62,15 @@ class Folder extends AbstractExceptionMode
      */
     public function next()
     {
+        # throw Exception in strict mode
+        if (!isset($this->aFolder["entries"])) {
+            if ($this->exceptionMode === DropboxHelper::MODE_STRICT) {
+                throw new FolderNotLoadException("Dropbox configuration error. Trying to get cursor without a reading folder. call loadFolder()/loadFolderContinue() before");
+            }
+
+            return null;
+        }
+        
         # One object is set on current index
         if (isset($this->aFolder["entries"][$this->iFolderIndex])) {
             return $this->getObjectOnCurrentIndex();
