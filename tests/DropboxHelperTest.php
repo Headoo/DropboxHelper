@@ -25,7 +25,7 @@ class DropboxHelperTest extends TestCase
         if (isset($env['DROPBOX_TOKEN'])) {
             $this->dropboxHelper = new DropboxHelper($env['DROPBOX_TOKEN']);
         } else {
-            echo "\nWARNING: Dropbox token is empty.\n";
+            trigger_error("WARNING: Dropbox token is empty.", E_USER_WARNING);
         }
     }
 
@@ -85,8 +85,6 @@ class DropboxHelperTest extends TestCase
         $sCursor = $oFolder->getCursor();
 
         self::assertNotEmpty($sCursor, 'Failed to get cursor on a loaded folder');
-
-        echo "\nLast Cursor of '{$this->sFolderPath}':\n$sCursor\n";
     }
 
     /**
@@ -168,26 +166,20 @@ class DropboxHelperTest extends TestCase
         }
 
         if (empty($this->sFolderPath)) {
-            echo 'WARNING: Cannot run ' . __FUNCTION__ . ', Dropbox folder path is empty.';
+            trigger_error('WARNING: Cannot run ' . __FUNCTION__ . ', Dropbox folder path is empty.', E_USER_WARNING);
             return;
         }
 
         $oFolder = $this->dropboxHelper->loadFolderPath($this->sFolderPath);
 
-        echo "\nList Folder: {$this->sFolderPath}\n";
         while ($oFolder && ($aMedia = $oFolder->next())) {
             if (DropboxHelper::isFile($aMedia)) {
-                echo 'File:' . $aMedia['name'] . ' ';
             }
             if (DropboxHelper::isFolder($aMedia)) {
-                echo 'Folder:' . DropboxHelper::getPath($aMedia);
             }
             if (DropboxHelper::isDeleted($aMedia)) {
-                echo 'Deleted:' . $aMedia['name'] . ' ';
             }
         }
-
-        echo "\n";
     }
 
     public function testListFolderFromCursor()
@@ -197,7 +189,7 @@ class DropboxHelperTest extends TestCase
         }
 
         if (empty($this->sCursor)) {
-            echo 'WARNING: Cannot run ' . __FUNCTION__ . ', Dropbox folder cursor is empty.';
+            trigger_error('WARNING: Cannot run ' . __FUNCTION__ . ', Dropbox folder cursor is empty.', E_USER_WARNING);
             return;
         }
 
@@ -205,9 +197,7 @@ class DropboxHelperTest extends TestCase
 
         self::assertNotNull($oFolder, "Cannot load a folder from cursor: {$this->sCursor}");
 
-        echo "\nList Folder from Cursor:\n";
         while (($aFolder = $oFolder->next())) {
-            echo $aFolder['.tag'] . ':' . $aFolder['name'] . ' ';
         }
     }
 

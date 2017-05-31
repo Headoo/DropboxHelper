@@ -70,7 +70,7 @@ class Folder extends AbstractExceptionMode
 
             return null;
         }
-        
+
         # One object is set on current index
         if (isset($this->aFolder["entries"][$this->iFolderIndex])) {
             return $this->getObjectOnCurrentIndex();
