@@ -92,6 +92,12 @@ List a folder from the cursor:
 ```
 
 # Unit Test
+
+## Prerequisite
+git clone https://github.com/Headoo/DropboxHelper.git
+composer install
+
+## Test
 To test this project with PHPUnit, declare following environment variables:
 ```bash
 $ export DROPBOX_TOKEN="YourAppDropboxToken"
