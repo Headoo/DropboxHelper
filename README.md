@@ -105,6 +105,10 @@ $ export DROPBOX_FOLDER_PATH="/Path/In/Your/Dropbox/To/Test"
 $ export DROPBOX_FOLDER_CURSOR="Last cursor of the folder"
 ```  
 
+* Your app Dropbox Token can be found here https://www.dropbox.com/developers/apps
+* For folder path, do not forget the leading slash
+* For folder cursor : 
+
 Then, launch PHPUnit:
 ```bash
 $ ./vendor/phpunit/phpunit/phpunit -c phpunit.xml
