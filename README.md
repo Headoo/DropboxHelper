@@ -105,8 +105,7 @@ $ export DROPBOX_FOLDER_PATH="/Path/In/Your/Dropbox/To/Test"
 ```  
 
 * Your app Dropbox Token can be found here https://www.dropbox.com/developers/apps
-* For folder path, do not forget the leading slash
-* For folder cursor : 
+* For folder path, do not forget the leading slash (/)
 
 Then, launch PHPUnit:
 ```bash
