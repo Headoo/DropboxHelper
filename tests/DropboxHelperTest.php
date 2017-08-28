@@ -209,7 +209,7 @@ class DropboxHelperTest extends TestCase
         );
     }
 
-    private function getCursorFromFolderPath(string $sFolderPath): string
+    private function getCursorFromFolderPath($sFolderPath)
     {
         $oFolder = $this->dropboxHelper->loadFolderPath($sFolderPath);
         return $oFolder->getCursor();
