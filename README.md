@@ -102,7 +102,6 @@ To test this project with PHPUnit, declare following environment variables:
 ```bash
 $ export DROPBOX_TOKEN="YourAppDropboxToken"
 $ export DROPBOX_FOLDER_PATH="/Path/In/Your/Dropbox/To/Test"
-$ export DROPBOX_FOLDER_CURSOR="Last cursor of the folder"
 ```  
 
 * Your app Dropbox Token can be found here https://www.dropbox.com/developers/apps
