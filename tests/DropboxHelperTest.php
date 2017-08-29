@@ -198,9 +198,6 @@ class DropboxHelperTest extends TestCase
 
         $oFolder = $this->dropboxHelper->loadFolderCursor($sCursor);
 
-        # This is the last cursor so Folder::next should return null
-        $this->assertNull($oFolder->next());
-
         # Test Folder::next after write
         $sTestFilePath = $this->sFolderPath . '/DropboxHelper-test-file-' . uniqid() . '.txt';
         $sContent = "PHP Unit Test of DropboxHelper:\n" . (new \DateTime())->format(DATE_ATOM);
@@ -209,11 +206,21 @@ class DropboxHelperTest extends TestCase
         $oFolder = $this->dropboxHelper->loadFolderCursor($sCursor);
         $this->assertInternalType('array', $oFolder->next());                
 
+        # Race condition: there may be other items to test
+        while (($aFolder = $oFolder->next())) {
+            $this->assertInternalType('array', $aFolder);
+        }
+
         # Test Folder::next after delete
         $bResult = $this->dropboxHelper->delete($sTestFilePath);
 
         $oFolder = $this->dropboxHelper->loadFolderCursor($sCursor);
         $this->assertInternalType('array', $oFolder->next());                
+
+        # Race condition: there may be other items to test
+        while (($aFolder = $oFolder->next())) {
+            $this->assertInternalType('array', $aFolder);
+        }
     }
 
     public function testFolder()
