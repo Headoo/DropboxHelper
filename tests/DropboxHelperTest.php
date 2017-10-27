@@ -9,9 +9,6 @@ class DropboxHelperTest extends TestCase
     /** @var string $sFolderPath: Path of folder on Dropbox */
     protected $sFolderPath = '/PathToTest/OnYourDropbox';
 
-    /** @var string : Cursor of the $sFodlerPath. We'll get only delta */
-    protected $sCursor = 'AAHeJvp9Yce1wS7YPADH7A-----';
-
     /** @var DropboxHelper */
     protected $dropboxHelper = null;
 
@@ -20,7 +17,6 @@ class DropboxHelperTest extends TestCase
         $env = array_merge($_ENV, $_SERVER);
 
         $this->sFolderPath = (isset($env['DROPBOX_FOLDER_PATH'])) ? $env['DROPBOX_FOLDER_PATH'] : null;
-        $this->sCursor     = (isset($env['DROPBOX_FOLDER_CURSOR'])) ? $env['DROPBOX_FOLDER_CURSOR'] : null;
 
         if (isset($env['DROPBOX_TOKEN'])) {
             $this->dropboxHelper = new DropboxHelper($env['DROPBOX_TOKEN']);
@@ -34,8 +30,17 @@ class DropboxHelperTest extends TestCase
      */
     public function testGetCurrentAccount()
     {
-        $result = $this->dropboxHelper->getCurrentAccount();
-        self::assertNotNull($result, 'Cannot get account information.');
+        $sResult = $this->dropboxHelper->getCurrentAccount();
+        self::assertNotNull($sResult, 'Cannot get account information.');
+        
+        // $sResult should be a json string, let's assert it below
+        
+        $this->assertInternalType('string', $sResult);        
+        $aResult = json_decode($sResult, true);
+        $this->assertInternalType('array', $aResult);                
+
+        // You shall be informed about the account you are playing with. Maybe only when --verbose or --debug ?
+        echo $sResult;
     }
 
     public function testWriteReadDeleteFile()
@@ -79,10 +84,10 @@ class DropboxHelperTest extends TestCase
             return;
         }
 
-        $oFolder = $this->dropboxHelper->loadFolderPath($this->sFolderPath);
-        $sCursor = $oFolder->getCursor();
+        $sCursor = $this->getCursorFromFolderPath($this->sFolderPath);
 
         self::assertNotEmpty($sCursor, 'Failed to get cursor on a loaded folder');
+        $this->assertInternalType('string', $sCursor);
     }
 
     /**
@@ -186,16 +191,35 @@ class DropboxHelperTest extends TestCase
             return;
         }
 
-        if (empty($this->sCursor)) {
-            trigger_error('WARNING: Cannot run ' . __FUNCTION__ . ', Dropbox folder cursor is empty.', E_USER_WARNING);
-            return;
+        $sCursor = $this->getCursorFromFolderPath($this->sFolderPath);
+        $oFolder = $this->dropboxHelper->loadFolderCursor($sCursor);
+
+        self::assertNotNull($oFolder, sprintf("Cannot load a folder from cursor: `%s`", $sCursor));
+
+        $oFolder = $this->dropboxHelper->loadFolderCursor($sCursor);
+
+        # Test Folder::next after write
+        $sTestFilePath = $this->sFolderPath . '/DropboxHelper-test-file-' . uniqid() . '.txt';
+        $sContent = "PHP Unit Test of DropboxHelper:\n" . (new \DateTime())->format(DATE_ATOM);
+        $bResult = $this->dropboxHelper->write($sTestFilePath, $sContent);
+
+        $oFolder = $this->dropboxHelper->loadFolderCursor($sCursor);
+        $this->assertInternalType('array', $oFolder->next());                
+
+        # Race condition: there may be other items to test
+        while (($aFolder = $oFolder->next())) {
+            $this->assertInternalType('array', $aFolder);
         }
 
-        $oFolder = $this->dropboxHelper->loadFolderCursor($this->sCursor);
+        # Test Folder::next after delete
+        $bResult = $this->dropboxHelper->delete($sTestFilePath);
 
-        self::assertNotNull($oFolder, "Cannot load a folder from cursor: {$this->sCursor}");
+        $oFolder = $this->dropboxHelper->loadFolderCursor($sCursor);
+        $this->assertInternalType('array', $oFolder->next());                
 
+        # Race condition: there may be other items to test
         while (($aFolder = $oFolder->next())) {
+            $this->assertInternalType('array', $aFolder);
         }
     }
 
@@ -206,5 +230,11 @@ class DropboxHelperTest extends TestCase
             $oFolder instanceof Folder,
             'Folder is not an instance of Folder()'
         );
+    }
+
+    private function getCursorFromFolderPath($sFolderPath)
+    {
+        $oFolder = $this->dropboxHelper->loadFolderPath($sFolderPath);
+        return $oFolder->getCursor();
     }
 }
