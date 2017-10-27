@@ -95,8 +95,8 @@ class DropboxHelperTest extends TestCase
 
         while ($oFolder && ($aMedia = $oFolder->next())) {
             self::assertStringStartsWith(
-                $this->sFolderPath,
-                $this->dropboxHelper->getPath($aMedia),
+                strtolower($this->sFolderPath),
+                strtolower($this->dropboxHelper->getPath($aMedia)),
                 'Failed to get path from the aMedia'
             );
             break;
@@ -258,18 +258,6 @@ class DropboxHelperTest extends TestCase
             $this->dropboxHelper,
             'handlerException',
             [(new \GuzzleHttp\Exception\TransferException())]
-        );
-    }
-
-    /**
-     * @expectedException \Headoo\DropboxHelper\Exception\NotFoundException
-     */
-    public function testHandlerExceptionClientException()
-    {
-        $this->invokeMethod(
-            $this->dropboxHelper,
-            'handlerException',
-            [(new \GuzzleHttp\Exception\ClientException('UT Exception', (new \GuzzleHttp\Psr7\Request('TEST', 'TEST'))))]
         );
     }
 
