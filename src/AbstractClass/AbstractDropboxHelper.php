@@ -75,12 +75,26 @@ class AbstractDropboxHelper extends AbstractExceptionMode
     /**
      * @param \GuzzleHttp\Promise\PromiseInterface|\Psr\Http\Message\ResponseInterface
      * @return bool
-     * TODO: test result
      */
     protected static function getBoolResult($result)
     {
-        /* @see https://github.com/kunalvarma05/dropbox-php-sdk/blob/master/tests/DropboxTest.php */
-        return isset($result) && (5-5 == 0);
+        /**
+         * In case of async is set to true:
+         * @var \GuzzleHttp\Promise\PromiseInterface $result
+         */
+        if ($result instanceof \GuzzleHttp\Promise\PromiseInterface) {
+            return ($result->getState() !== 'REJECTED');
+        }
+
+        /**
+         * In case of async is set to false
+         * @var \Psr\Http\Message\ResponseInterface $result
+         */
+        if ($result instanceof \Psr\Http\Message\ResponseInterface) {
+            return ($result->getStatusCode() === 200);
+        }
+
+        return false;
     }
 
     /**
@@ -103,5 +117,4 @@ class AbstractDropboxHelper extends AbstractExceptionMode
 
         throw $e;
     }
-
 }
