@@ -76,7 +76,7 @@ class AbstractDropboxHelper extends AbstractExceptionMode
      * @param \GuzzleHttp\Promise\PromiseInterface|\Psr\Http\Message\ResponseInterface
      * @return bool
      */
-    protected static function getBoolResult($result)
+    protected static function getBoolResult($result = null)
     {
         /**
          * In case of async is set to true:

@@ -85,6 +85,24 @@ class DropboxHelperTest extends TestCase
         self::assertNotEmpty($sCursor, 'Failed to get cursor on a loaded folder');
     }
 
+    public function testGetPath()
+    {
+        if (!$this->dropboxHelper) {
+            return;
+        }
+
+        $oFolder = $this->dropboxHelper->loadFolderPath($this->sFolderPath);
+
+        while ($oFolder && ($aMedia = $oFolder->next())) {
+            self::assertStringStartsWith(
+                strtolower($this->sFolderPath),
+                strtolower($this->dropboxHelper->getPath($aMedia)),
+                'Failed to get path from the aMedia'
+            );
+            break;
+        }
+    }
+
     /**
      * @expectedException \Headoo\DropboxHelper\Exception\NotFoundException
      */
@@ -206,5 +224,58 @@ class DropboxHelperTest extends TestCase
             $oFolder instanceof Folder,
             'Folder is not an instance of Folder()'
         );
+    }
+
+    public function testGetBoolResult()
+    {
+        $this->assertFalse(
+            $this->invokeMethod($this->dropboxHelper, 'getBoolResult', []),
+            'getBoolResult(): Empty result should return false'
+        );
+
+        $this->assertTrue(
+            $this->invokeMethod($this->dropboxHelper, 'getBoolResult', [(new \GuzzleHttp\Psr7\Response(200))]),
+            'getBoolResult(): ResponseInterface with status 200 should return true'
+        );
+
+        $this->assertFalse(
+            $this->invokeMethod($this->dropboxHelper, 'getBoolResult', [(new \GuzzleHttp\Psr7\Response(300))]),
+            'getBoolResult(): ResponseInterface with status non 200 should return false'
+        );
+
+        $this->assertTrue(
+            $this->invokeMethod($this->dropboxHelper, 'getBoolResult', [(new \GuzzleHttp\Promise\Promise())]),
+            'getBoolResult(): PromiseInterface should return true'
+        );
+    }
+
+    /**
+     * @expectedException \GuzzleHttp\Exception\TransferException
+     */
+    public function testHandlerExceptionAnyException()
+    {
+        $this->invokeMethod(
+            $this->dropboxHelper,
+            'handlerException',
+            [(new \GuzzleHttp\Exception\TransferException())]
+        );
+    }
+
+    /**
+     * Call protected/private method of a class.
+     *
+     * @param object &$object    Instantiated object that we will run method on.
+     * @param string $methodName Method name to call
+     * @param array  $parameters Array of parameters to pass into method.
+     *
+     * @return mixed Method return.
+     */
+    static private function invokeMethod(&$object, $methodName, array $parameters = [])
+    {
+        $reflection = new \ReflectionClass(get_class($object));
+        $method = $reflection->getMethod($methodName);
+        $method->setAccessible(true);
+
+        return $method->invokeArgs($object, $parameters);
     }
 }
